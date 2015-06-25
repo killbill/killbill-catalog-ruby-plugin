@@ -46,6 +46,7 @@ module CatalogControlPluginModule
       catalog.children_price_list = []
       catalog.plan_rules = ''
       standalone_catalogs << catalog
+      puts "standalone_catalogs = #{standalone_catalogs.inspect}"
       standalone_catalogs
     end
 
@@ -105,11 +106,13 @@ module CatalogControlPluginModule
     def create_phase
       #:fixed, :recurring, :usages, :name, :duration, :phase_type
       p = Killbill::Plugin::Model::PlanPhase.new
+      tmp_recurring = create_recurring
+      tmp_duration = create_duration
       p.fixed = nil
-      p.recurring = create_recurring
+      p.recurring = tmp_recurring
       p.usages = []
       p.name = 'gold-monthly-evergreen'
-      p.duration = create_duration
+      p.duration = tmp_duration
       p.phase_type = :EVERGREEN
       p
     end
@@ -117,8 +120,9 @@ module CatalogControlPluginModule
     def create_recurring
       # :billing_period, :recurring_price
       p = Killbill::Plugin::Model::Recurring.new
+      tmp_international_price = create_international_price
       p.billing_period = :MONTHLY
-      p.recurring_price = create_international_price
+      p.recurring_price = tmp_international_price
       p
     end
 
@@ -126,17 +130,20 @@ module CatalogControlPluginModule
     def create_international_price
       # :prices, :is_zero
       p = Killbill::Plugin::Model::InternationalPrice.new
-      p.prices = [create_price]
+      tmp_prices = create_prices
+      p.prices = tmp_prices
       p.is_zero = false
       p
     end
 
-    def create_price
+    def create_prices
       # :currency, :value
+      prices = []
       p = Killbill::Plugin::Model::Price.new
       p.currency = :USD
       p.value = BigDecimal.new('13.6')
-      p
+      prices << p
+      prices
     end
 
     def create_duration
