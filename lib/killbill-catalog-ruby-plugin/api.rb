@@ -6,13 +6,15 @@ module CatalogControlPluginModule
 
     def initialize
       super
-      puts "CatalogControlPluginModule::CatalogControlPlugin initialize..."
     end
 
+    #
+    # Will build a dummy plugin catalog with one version, and one plan
+    # (The goal is to verify all the plumbing is working and Kill Bill can create a subscription based on that plugin catalog)
+    #
     def get_versioned_plugin_catalog(properties, context)
       standalone_catalogs = create_standalone_catalogs
       version_catalog = create_versioned_plugin_catalog(standalone_catalogs)
-      puts "CatalogControlPluginModule version_catalog = #{version_catalog.inspect}"
       version_catalog
     end
 
@@ -29,8 +31,6 @@ module CatalogControlPluginModule
 
     def create_standalone_catalogs
       standalone_catalogs = []
-      # attr_accessor :effective_date, :currencies, :units, :products, :plans, :default_price_list, :children_price_list, :plan_rules
-
       product = create_product
       phase = create_phase
       plan = create_plan(product, phase)
@@ -39,20 +39,18 @@ module CatalogControlPluginModule
       catalog =  Killbill::Plugin::Model::StandalonePluginCatalog.new
       catalog.effective_date = DateTime.parse("2012-01-20T07:30:42.000Z").iso8601(3)
       catalog.currencies = [:USD]
-      catalog.units = [] # Killbill::Plugin::Model::Unit.new (name)
+      catalog.units = []
       catalog.products = [product]
       catalog.plans = [plan]
       catalog.default_price_list = pricelist
       catalog.children_price_list = []
-      catalog.plan_rules = ''
+      catalog.plan_rules = Killbill::Plugin::Model::PlanRules.new
       standalone_catalogs << catalog
-      puts "standalone_catalogs = #{standalone_catalogs.inspect}"
       standalone_catalogs
     end
 
 
     def create_rules
-      # :case_change_plan_policy, :case_change_plan_alignment, :case_cancel_policy, :case_create_alignment, :case_billing_alignment, :case_price_list
       p = Killbill::Plugin::Model::PlanRules.new
       p.case_change_plan_policy = []
       p.case_change_plan_alignment = []
@@ -63,13 +61,7 @@ module CatalogControlPluginModule
       p
     end
 
-    def create_case_change_plan_policy
-      # :phase_type, :from_product, :from_product_category, :from_billing_period, :from_price_list, :to_product, :to_product_category, :to_billing_period, :to_price_list, :billing_action_policy
-      p = Killbill::Plugin::Model::CaseChangePlanPolicy.new
-    end
-
     def create_price_list(plans)
-      #:name, :is_retired, :plans
       p = Killbill::Plugin::Model::PriceList.new
       p.name = 'DEFAULT'
       p.is_retired = false
@@ -78,7 +70,6 @@ module CatalogControlPluginModule
     end
 
     def create_product
-      # :name, :is_retired, :available, :included, :category, :catalog_name, :limits
       p = Killbill::Plugin::Model::Product.new
       p.name = 'Gold'
       p.is_retired = false
@@ -91,20 +82,19 @@ module CatalogControlPluginModule
     end
 
     def create_plan(product, phase)
-      #:initial_phases, :product, :name, :is_retired, :initial_phase_iterator, :final_phase, :recurring_billing_period, :plans_allowed_in_bundle, :all_phases, :effective_date_for_existing_subscriptons
       p = Killbill::Plugin::Model::Plan.new
       p.initial_phases = []
       p.product = product
       p.name = 'gold-monthly'
       p.is_retired = false
       p.final_phase = phase
+      p.all_phases = [phase]
       p.recurring_billing_period = :MONTHLY
       p.plans_allowed_in_bundle = -1
       p
     end
 
     def create_phase
-      #:fixed, :recurring, :usages, :name, :duration, :phase_type
       p = Killbill::Plugin::Model::PlanPhase.new
       tmp_recurring = create_recurring
       tmp_duration = create_duration
@@ -118,7 +108,6 @@ module CatalogControlPluginModule
     end
 
     def create_recurring
-      # :billing_period, :recurring_price
       p = Killbill::Plugin::Model::Recurring.new
       tmp_international_price = create_international_price
       p.billing_period = :MONTHLY
@@ -128,7 +117,6 @@ module CatalogControlPluginModule
 
 
     def create_international_price
-      # :prices, :is_zero
       p = Killbill::Plugin::Model::InternationalPrice.new
       tmp_prices = create_prices
       p.prices = tmp_prices
