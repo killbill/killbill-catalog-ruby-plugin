@@ -36,7 +36,7 @@ fi
 echo 'Building artifact'
 $BUNDLE rake killbill:package
 
-ARTIFACT="$PWD/pkg/killbill-catalog-ruby-$VERSION.tar.gz"
+ARTIFACT="$PWD/pkg/killbill-catalog-ruby-plugin-$VERSION.tar.gz"
 echo "Pushing $ARTIFACT to Maven Central"
 
 if [[ -z "$NO_RELEASE" ]]; then
