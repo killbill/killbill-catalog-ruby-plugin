@@ -64,7 +64,6 @@ module CatalogControlPluginModule
     def create_price_list(plans)
       p = Killbill::Plugin::Model::PriceList.new
       p.name = 'DEFAULT'
-      p.is_retired = false
       p.plans = plans
       p
     end
@@ -72,11 +71,9 @@ module CatalogControlPluginModule
     def create_product
       p = Killbill::Plugin::Model::Product.new
       p.name = 'Gold'
-      p.is_retired = false
       p.available = []
       p.included = []
       p.category = :BASE
-      #p.catalog_name =
       p.limits = []
       p
     end
@@ -86,10 +83,10 @@ module CatalogControlPluginModule
       p.initial_phases = []
       p.product = product
       p.name = 'gold-monthly'
-      p.is_retired = false
       p.final_phase = phase
       p.all_phases = [phase]
       p.recurring_billing_period = :MONTHLY
+      p.price_list_name = 'DEFAULT'
       p.plans_allowed_in_bundle = -1
       p
     end
