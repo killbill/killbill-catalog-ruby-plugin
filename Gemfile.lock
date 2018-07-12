@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    killbill-catalog-ruby-plugin (0.2.0)
+    killbill-catalog-ruby-plugin (0.3.0)
       killbill (~> 9.4)
 
 GEM
