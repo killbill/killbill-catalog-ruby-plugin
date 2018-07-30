@@ -18,16 +18,20 @@ module CatalogControlPluginModule
       version_catalog
     end
 
+    def get_latest_catalog_version(properties, context)
+      nil
+    end
 
     private
 
     def create_versioned_plugin_catalog(standalone_catalogs)
       version_catalog = Killbill::Plugin::Model::VersionedPluginCatalog.new
       version_catalog.catalog_name = 'demo'
-      version_catalog.recurring_billing_mode = :IN_ARREAR
       version_catalog.standalone_plugin_catalogs = standalone_catalogs
       version_catalog
     end
+
+
 
     def create_standalone_catalogs
       standalone_catalogs = []
@@ -48,6 +52,7 @@ module CatalogControlPluginModule
       standalone_catalogs << catalog
       standalone_catalogs
     end
+
 
 
     def create_rules
@@ -88,6 +93,7 @@ module CatalogControlPluginModule
       p.recurring_billing_period = :MONTHLY
       p.price_list_name = 'DEFAULT'
       p.plans_allowed_in_bundle = -1
+      p.recurring_billing_mode = :IN_ARREAR
       p
     end
 
